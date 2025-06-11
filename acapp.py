@@ -3,6 +3,8 @@ import whisper
 import yt_dlp
 import os
 import uuid
+import glob
+
 
 # Load Whisper model once
 @st.cache_resource
@@ -12,12 +14,12 @@ def load_model():
 model = load_model()
 
 # Download audio using yt_dlp
+
 def download_audio(url):
     base_name = f"audio_{uuid.uuid4().hex}"
-    final_name = base_name + ".mp3"
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': base_name, 
+        'outtmpl': base_name,  # No extension here
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -29,9 +31,16 @@ def download_audio(url):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        return final_name
+        
+        # Find the actual .mp3 file using glob
+        audio_files = glob.glob(f"{base_name}*.mp3")
+        if not audio_files:
+            raise Exception("Audio file not found after download.")
+
+        return audio_files[0]
     except Exception as e:
         raise Exception(f"Failed to download audio: {e}")
+
 
 
 # Transcribe with Whisper
