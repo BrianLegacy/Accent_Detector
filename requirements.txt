@@ -2,3 +2,4 @@ streamlit
 openai-whisper
 pytube
 ffmpeg-python
+torch>=2.0.0
