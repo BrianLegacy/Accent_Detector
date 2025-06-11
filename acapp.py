@@ -13,10 +13,11 @@ model = load_model()
 
 # Download audio using yt_dlp
 def download_audio(url):
-    unique_name = f"audio_{uuid.uuid4().hex}.mp3"
+    base_name = f"audio_{uuid.uuid4().hex}"
+    final_name = base_name + ".mp3"
     ydl_opts = {
         'format': 'bestaudio/best',
-        'outtmpl': unique_name,
+        'outtmpl': base_name, 
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -28,9 +29,10 @@ def download_audio(url):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        return unique_name
+        return final_name
     except Exception as e:
         raise Exception(f"Failed to download audio: {e}")
+
 
 # Transcribe with Whisper
 def transcribe(audio_path):
